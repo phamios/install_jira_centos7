@@ -1,0 +1,42 @@
+### Install MySQL
+Visit https://dev.mysql.com/downloads/repo/yum, get right version. eg: mysql57-community-release-el7-11.noarch.rpm
+- `wget https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm`
+- `sudo rpm -ivh mysql57-community-release-el7-11.noarch.rpm`
+- `sudo yum install mysql-server`
+    - `sudo systemctl start mysqld` 
+    - `sudo systemctl status mysqld`
+- `sudo grep 'temporary password' /var/log/mysqld.log` get default root password
+- `sudo mysql_secure_installation` use default password and change password
+    - >Enter a new 12-character password that contains uppercase letter, lowercase letter, number and special character. 
+- `mysql -u root -p`
+- `CREATE DATABASE jira_db CHARACTER SET utf8 COLLATE utf8_bin;`
+- `CREATE USER 'jira'@'localhost' IDENTIFIED BY 'pass4jira';`
+- `GRANT SELECT,INSERT,UPDATE,DELETE,CREATE,DROP,ALTER,INDEX on jira_db.* TO 'jira'@'localhost' IDENTIFIED BY 'pass4jira';`
+- `flush privileges;`
+- restart mysql
+
+### Install Java
+- `sudo yum install java-1.8.0-openjdk`
+- `sudo yum install java-1.8.0-openjdk-devel`
+
+### Install Jira
+- localhost download jira from: https://www.atlassian.com/software/jira/download, get file: atlassian-jira-software-7.8.0-x64.bin
+- `scp atlassian-jira-software-7.8.0-x64.bin name@host:~/Download/jira-78.bin`
+- `ssh name@host`
+- `cd ~/Download/`
+- `chmod 755 jira-78.bin`
+- `./jira-78.bin`
+- download mysql connector:
+    - >https://dev.mysql.com/downloads/connector/j/, get file: mysql-connector-java-5.1.46.tar.gz
+    - `scp mysql-connector-java-5.1.46.tar.gz name@host:<jira-application-dir>/atlassian-jira/WEB-INF/lib/mysql-connector-java-5.1.46.tar.gz`
+- `sudo firewall-cmd --zone=public --add-port=8080/tcp --permanent`
+- `sudo firewall-cmd --reload`
+- `/etc/init.d/jira start`
+
+### tips
+Installation Directory: /opt/atlassian/confluence    
+Home Directory: /var/atlassian/application-data/confluence    
+**Backup**
+/var/atlassian/application-data/jira/export/data-4-25_jira.backup.zip    
+/var/atlassian/application-data/jira/export/5-2.jirabackup.zip    
+/etc/nginx/nginx.conf   local{client_max_body_size 10M}    
